@@ -46,7 +46,7 @@ docker run --rm --name "centos7" -d pycontribs/centos:7 sleep 3600
 ![image](https://github.com/user-attachments/assets/1d5af7d2-7427-48d2-85bf-50463dc23d27)
 
 ```
-TASK [Print fact] *********************************************************************************************************************************************************************************
+TASK [Print fact]
 ok: [centos7] => {
     "msg": "el" # Значение some_fact для хоста centos 7
 }
