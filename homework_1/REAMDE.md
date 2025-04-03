@@ -131,7 +131,7 @@ ansible-doc -t connection --list | grep local #local         execute on controll
 
 Запускаем playbook с ключом --ask-vault-pass
 
-![ansible_homework1](https://github.com/user-attachments/assets/ecc4eacf-0586-4f0e-91e4-1063c9c9f971)
+![image](https://github.com/user-attachments/assets/63c2cae3-4527-44e2-9011-5308232dd6ea)
 
 
 Все значения верны.
