@@ -41,3 +41,6 @@ docker run --rm --name "centos7" -d pycontribs/centos:7 sleep 3600
 
 # Задача 4 
 
+Запускаем playbook на окружении из prod.yml
+
+![image](https://github.com/user-attachments/assets/1d5af7d2-7427-48d2-85bf-50463dc23d27)
