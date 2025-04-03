@@ -30,3 +30,14 @@ cat examp.yml
 
 # Задача 3
 
+Создаем окружение при помощи docker для дальнейшего выполнения заданий:
+
+```
+docker run --rm --name "ubuntu" -d pycontribs/ubuntu:latest sleep 3600
+docker run --rm --name "centos7" -d pycontribs/centos:7 sleep 3600
+```
+
+Выбор пал на образ pycontribs/ubuntu потому что он идеально подходит для для тестирования, CI/CD и разработки, особенно в экосистеме Python и Ansible.
+
+# Задача 4 
+
