@@ -78,6 +78,8 @@ cat /home/ansbile_homework/homework_1/playbook/group_vars/el/examp.yml
 
 # Задача 7
 
+Зашифровал факты в group_vars/deb/examp.yml и group_vars/el/examp.yml
+
 ```
 ansible-vault encrypt group_vars/deb/examp.yml 
 New Vault password: 
@@ -92,3 +94,7 @@ Encryption successful
 
 
 # Задача 8
+
+Запускаем playbook с ключом --ask-vault-pass
+
+![image](https://github.com/user-attachments/assets/31a35805-2bf6-4c96-89f2-2741d115cfec)
