@@ -78,3 +78,17 @@ cat /home/ansbile_homework/homework_1/playbook/group_vars/el/examp.yml
 
 # Задача 7
 
+```
+ansible-vault encrypt group_vars/deb/examp.yml 
+New Vault password: 
+Confirm New Vault password: 
+Encryption successful
+
+ansible-vault encrypt group_vars/el/examp.yml
+New Vault password: 
+Confirm New Vault password: 
+Encryption successful
+```
+
+
+# Задача 8
