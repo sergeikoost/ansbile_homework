@@ -55,3 +55,17 @@ ok: [ubuntu] => {
 }
 ```
 
+# Задача 5
+
+
+Добавляем факты:
+
+```
+cat /home/ansbile_homework/homework_1/playbook/group_vars/deb/examp.yml 
+---
+  some_fact: "deb default fact"
+cat /home/ansbile_homework/homework_1/playbook/group_vars/el/examp.yml 
+---
+  some_fact: "el default fact"
+```
+
