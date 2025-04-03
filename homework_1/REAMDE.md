@@ -98,3 +98,40 @@ Encryption successful
 Запускаем playbook с ключом --ask-vault-pass
 
 ![image](https://github.com/user-attachments/assets/31a35805-2bf6-4c96-89f2-2741d115cfec)
+
+# Задача 9
+
+ Задача требует выбрать плагин для работы на control node (самом Ansible-сервере), значит подойдут только локальные плагины.
+
+```
+ansible-doc -t connection --list | grep local #local         execute on controller  
+```
+
+# Задача 10
+
+Добавил в prod.yml новую группу хостов
+
+```
+---
+  el:
+    hosts:
+      centos7:
+        ansible_connection: docker
+  deb:
+    hosts:
+      ubuntu:
+        ansible_connection: docker
+  local:
+    hosts:
+      localhost:
+        ansible_connection: local # Локал хосты
+```
+
+# Задача 10
+
+Запускаем playbook с ключом --ask-vault-pass
+
+![ansible_homework1](https://github.com/user-attachments/assets/ecc4eacf-0586-4f0e-91e4-1063c9c9f971)
+
+
+Все значения верны.
