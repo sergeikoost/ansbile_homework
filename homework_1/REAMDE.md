@@ -127,7 +127,7 @@ ansible-doc -t connection --list | grep local #local         execute on controll
         ansible_connection: local # Локал хосты
 ```
 
-# Задача 10
+# Задача 11
 
 Запускаем playbook с ключом --ask-vault-pass
 
