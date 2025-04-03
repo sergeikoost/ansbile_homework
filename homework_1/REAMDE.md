@@ -69,3 +69,12 @@ cat /home/ansbile_homework/homework_1/playbook/group_vars/el/examp.yml
   some_fact: "el default fact"
 ```
 
+# Задача 6
+
+Производим запуск playbook, видим что значения корректны:
+
+![image](https://github.com/user-attachments/assets/62eca9c5-b442-44c0-a0f5-4d3c7246bfc6)
+
+
+# Задача 7
+
