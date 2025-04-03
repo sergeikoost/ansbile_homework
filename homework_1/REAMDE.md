@@ -20,3 +20,13 @@ git clone https://github.com/sergeikoost/ansbile_homework.git
 
 # Задача 2
 
+```
+cat examp.yml 
+---
+  some_fact: 'all default fact'
+```
+
+![image](https://github.com/user-attachments/assets/820dd6a4-4426-4195-a8fb-efe270d85156)
+
+# Задача 3
+
