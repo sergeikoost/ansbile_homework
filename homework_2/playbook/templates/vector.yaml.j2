@@ -1,5 +1,5 @@
 sources:
-  generator:
+  demo_logs:
     type: demo_logs
     format: apache_common
     interval: 1
@@ -8,7 +8,7 @@ sinks:
   clickhouse:
     type: clickhouse
     inputs:
-      - generator
+      - demo_logs
     database: logs
     table: access_logs
     endpoint: http://clickhouse:8123

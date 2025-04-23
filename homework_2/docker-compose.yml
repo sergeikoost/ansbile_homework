@@ -34,6 +34,8 @@ services:
     depends_on:
       clickhouse:
         condition: service_healthy
+    command: ["tail", "-f", "/dev/null"]  # Временная команда для поддержания работы контейнера
+
     healthcheck:
       test: ["CMD", "vector", "validate", "/etc/vector/vector.yaml"]
       interval: 10s

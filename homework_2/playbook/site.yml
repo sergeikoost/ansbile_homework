@@ -36,36 +36,69 @@
       changed_when: create_db.rc == 0
 - name: Install and configure Vector
   hosts: vector
+  vars:
+    vector_version: "0.34.0"
+    vector_install_dir: "/opt/vector"
+    vector_config_dir: "/etc/vector"
+  
   handlers:
     - name: Restart Vector
       become: true
-      ansible.builtin.service:
+      ansible.builtin.systemd:
         name: vector
         state: restarted
 
   tasks:
-    - name: Install Vector
-      become: true
-      ansible.builtin.package:
-        name: vector
-        state: present
-
-    - name: Create Vector config directory
+    - name: Create installation directory
       ansible.builtin.file:
-        path: /etc/vector
+        path: "{{ vector_install_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Download Vector
+      ansible.builtin.get_url:
+        url: "https://packages.timber.io/vector/{{ vector_version }}/vector-{{ vector_version }}-x86_64-unknown-linux-gnu.tar.gz"
+        dest: "/tmp/vector-{{ vector_version }}.tar.gz"
+        checksum: "sha256:9a5a6d0b9a9eb7a9f3f3a3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3"
+
+    - name: Extract Vector
+      ansible.builtin.unarchive:
+        src: "/tmp/vector-{{ vector_version }}.tar.gz"
+        dest: "{{ vector_install_dir }}"
+        remote_src: yes
+        extra_opts: ["--strip-components=1"]
+
+    - name: Create symlink to binary
+      ansible.builtin.file:
+        src: "{{ vector_install_dir }}/bin/vector"
+        dest: "/usr/local/bin/vector"
+        state: link
+        force: yes
+
+    - name: Create config directory
+      ansible.builtin.file:
+        path: "{{ vector_config_dir }}"
         state: directory
         mode: '0755'
 
     - name: Deploy Vector config
       ansible.builtin.template:
         src: templates/vector.yaml.j2
-        dest: /etc/vector/vector.yaml
+        dest: "{{ vector_config_dir }}/vector.yaml"
         mode: '0644'
       notify: Restart Vector
 
-    - name: Ensure Vector is running
+    - name: Create systemd service
+      ansible.builtin.template:
+        src: templates/vector.service.j2
+        dest: /etc/systemd/system/vector.service
+        mode: '0644'
+      notify: Restart Vector
+
+    - name: Ensure Vector is enabled and started
       become: true
-      ansible.builtin.service:
+      ansible.builtin.systemd:
         name: vector
         state: started
         enabled: yes
+        daemon_reload: yes
