@@ -1,0 +1,17 @@
+sources:
+  generator:
+    type: demo_logs
+    format: apache_common
+    interval: 1
+
+sinks:
+  clickhouse:
+    type: clickhouse
+    inputs:
+      - generator
+    database: logs
+    table: access_logs
+    endpoint: http://clickhouse:8123
+    skip_unknown_fields: true
+    encoding:
+      codec: json
