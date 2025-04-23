@@ -1,0 +1,14 @@
+sources:
+  test:
+    type: demo_logs
+    format: syslog
+    interval: 1
+
+sinks:
+  clickhouse:
+    type: clickhouse
+    inputs: ["test"]
+    endpoint: "http://clickhouse:8123"
+    database: "default"
+    table: "logs"
+    skip_unknown_fields: true

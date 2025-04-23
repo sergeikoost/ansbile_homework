@@ -7,54 +7,23 @@ services:
     ports:
       - "8123:8123"
       - "9000:9000"
-    ulimits:
-      nofile:
-        soft: 262144
-        hard: 262144
-    volumes:
-      - clickhouse_data:/var/lib/clickhouse
-      - clickhouse_config:/etc/clickhouse-server
-    environment:
-      # Явно указываем путь к конфигурации
-      CLICKHOUSE_CONFIG: /etc/clickhouse-server/config.xml
     healthcheck:
-        test: ["CMD-SHELL", "clickhouse-client --query 'SELECT 1'"]
-        interval: 10s
-        timeout: 30s
-        retries: 15
-        start_period: 60s
+     test: ["CMD-SHELL", "clickhouse-client --query 'SELECT 1'"]
+     interval: 10s
+     timeout: 30s
+     retries: 15
+     start_period: 60s
   vector:
     image: timberio/vector:0.34.0-alpine
     container_name: vector-01
-    volumes:
-      - ./vector_config:/etc/vector
-      - ./vector_data:/var/lib/vector
-    ports:
-      - "8686:8686"  # Vector API
     depends_on:
       clickhouse:
         condition: service_healthy
-    command: ["tail", "-f", "/dev/null"]  # Временная команда для поддержания работы контейнера
-
+    volumes:
+      - ./vector.yml:/etc/vector/vector.yml
+    command: ["--config", "/etc/vector/vector.yml"]
     healthcheck:
-      test: ["CMD", "vector", "validate", "/etc/vector/vector.yaml"]
+      test: ["CMD-SHELL", "curl -s http://localhost:8686/health || exit 1"]
       interval: 10s
-      timeout: 5s
-      retries: 3
-
-  ansible-runner:
-    image: quay.io/ansible/ansible-runner:latest
-    container_name: ansible-runner
-    volumes:
-      - .:/runner
-    depends_on:
-      clickhouse:
-        condition: service_healthy
-      vector:
-        condition: service_healthy
-    command: sleep infinity
-
-volumes:
-  clickhouse_data:
-  clickhouse_config:
-  vector_data:
+      timeout: 2s
+      start_period: 10s
