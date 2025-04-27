@@ -1,6 +1,6 @@
 ---
 - name: Install Clickhouse
-  hosts: remote_server
+  hosts: clickhouse
   handlers:
     - name: Start clickhouse service
       become: true
@@ -11,7 +11,7 @@
     - block:
         - name: Get clickhouse distrib
           ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.noarch.rpm"
+            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.x86_64.rpm"
             dest: "./{{ item }}-{{ clickhouse_version }}.rpm"
           with_items: "{{ clickhouse_packages }}"
       rescue:
@@ -36,7 +36,7 @@
       changed_when: create_db.rc == 0
 
 - name: Install and configure Vector
-  hosts: remote_server
+  hosts: clickhouse
   become: yes
   vars:
     vector_version: "0.34.0"
