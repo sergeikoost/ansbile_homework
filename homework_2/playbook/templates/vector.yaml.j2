@@ -1,17 +1,14 @@
 sources:
-  demo_logs:
-    type: demo_logs
-    format: apache_common
-    interval: 1
+  syslog:
+    type: syslog
+    mode: tcp
+    address: "0.0.0.0:514"
 
 sinks:
   clickhouse:
     type: clickhouse
-    inputs:
-      - demo_logs
-    database: logs
-    table: access_logs
-    endpoint: http://clickhouse:8123
+    inputs: ["syslog"]
+    endpoint: "http://localhost:8123"
+    database: "default"
+    table: "logs"
     skip_unknown_fields: true
-    encoding:
-      codec: json

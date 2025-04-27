@@ -34,71 +34,63 @@
       register: create_db
       failed_when: create_db.rc != 0 and create_db.rc !=82
       changed_when: create_db.rc == 0
+
 - name: Install and configure Vector
-  hosts: vector
+  hosts: remote_server
+  become: yes
   vars:
     vector_version: "0.34.0"
-    vector_install_dir: "/opt/vector"
-    vector_config_dir: "/etc/vector"
-  
-  handlers:
-    - name: Restart Vector
-      become: true
-      ansible.builtin.systemd:
-        name: vector
-        state: restarted
-
   tasks:
-    - name: Create installation directory
-      ansible.builtin.file:
-        path: "{{ vector_install_dir }}"
-        state: directory
-        mode: '0755'
-
     - name: Download Vector
       ansible.builtin.get_url:
         url: "https://packages.timber.io/vector/{{ vector_version }}/vector-{{ vector_version }}-x86_64-unknown-linux-gnu.tar.gz"
-        dest: "/tmp/vector-{{ vector_version }}.tar.gz"
-        checksum: "sha256:9a5a6d0b9a9eb7a9f3f3a3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3"
+        dest: "/tmp/vector.tar.gz"
+        checksum: "sha256:3a39e712da43126262db878c3ae7647b23aac88834dea2763cc84269cb3c0206"
+
+    - name: Create installation directory
+      ansible.builtin.file:
+        path: "/opt/vector-{{ vector_version }}"
+        state: directory
 
     - name: Extract Vector
       ansible.builtin.unarchive:
-        src: "/tmp/vector-{{ vector_version }}.tar.gz"
-        dest: "{{ vector_install_dir }}"
+        src: "/tmp/vector.tar.gz"
+        dest: "/opt/vector-{{ vector_version }}"
         remote_src: yes
         extra_opts: ["--strip-components=1"]
+        creates: "/opt/vector-{{ vector_version }}/bin/vector"
 
     - name: Create symlink to binary
       ansible.builtin.file:
-        src: "{{ vector_install_dir }}/bin/vector"
+        src: "/opt/vector-{{ vector_version }}/bin/vector"
         dest: "/usr/local/bin/vector"
         state: link
-        force: yes
+        force: yes  # Добавлено force для перезаписи существующей ссылки
 
-    - name: Create config directory
+    - name: Create Vector config directory
       ansible.builtin.file:
-        path: "{{ vector_config_dir }}"
+        path: "/etc/vector"
         state: directory
         mode: '0755'
 
     - name: Deploy Vector config
       ansible.builtin.template:
-        src: templates/vector.yaml.j2
-        dest: "{{ vector_config_dir }}/vector.yaml"
+        src: "{{ playbook_dir }}/templates/vector.yaml.j2"
+        dest: "/etc/vector/vector.yml"
         mode: '0644'
-      notify: Restart Vector
 
-    - name: Create systemd service
+    - name: Deploy systemd service
       ansible.builtin.template:
-        src: templates/vector.service.j2
-        dest: /etc/systemd/system/vector.service
+        src: "{{ playbook_dir }}/templates/vector.service.j2"
+        dest: "/etc/systemd/system/vector.service"
         mode: '0644'
-      notify: Restart Vector
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: yes
 
     - name: Ensure Vector is enabled and started
-      become: true
       ansible.builtin.systemd:
         name: vector
         state: started
         enabled: yes
-        daemon_reload: yes
