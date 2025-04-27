@@ -1,10 +1,6 @@
-clickhouse:
+all:
   hosts:
-    clickhouse-01:
-      ansible_host: clickhouse
-      ansible_connection: docker
-vector:
-  hosts:
-    vector-01:
-      ansible_host: vector
-      ansible_connection: docker
+    remote_server:
+      ansible_host: 158.160.12.146
+      ansible_user: kusk111serj 
+      ansible_ssh_private_key_file: /root/.ssh/ansible_hm
