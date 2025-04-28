@@ -1,26 +1,24 @@
----
-data_dir: {{ vector_data_dir }}
-
-# Random Syslog-formatted logs
 sources:
-  dummy_logs:
+  apache_logs:
     type: demo_logs
-    format: syslog
+    format: apache_common
     interval: 1
+    count: 100
 
-
-# Save parsed logs to Clickhouse
 sinks:
-  clickhouse_logs:
+  clickhouse_sink:
     type: clickhouse
-    inputs:
-      - dummy_logs
-    database: {{ all_clickhouse_db }}
-    endpoint: {{ all_clickhouse_url }}
-    table: {{ all_clickhouse_table }}
-    acknowledgements:
-      enabled: false
-    healthcheck:
-      enabled: false
-    compression: gzip
+    inputs: [apache_logs]
+    endpoint: "http://localhost:8123"
+    database: "logs"
+    table: "access_logs"
     skip_unknown_fields: true
+    compression: gzip
+    format: "JSONEachRow"
+    request:
+      retry_attempts: 5
+      retry_initial_backoff_secs: 1
+      timeout_secs: 30
+    auth:
+      user: "default"
+      password: ""
