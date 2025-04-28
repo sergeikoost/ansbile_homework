@@ -1,40 +1,71 @@
 ---
-- name: Install Clickhouse
+- name: Install ClickHouse from official DEB packages
   hosts: clickhouse
-  handlers:
-    - name: Start clickhouse service
+  tasks:
+  
+    # Добавляем GPG-ключ (как в документации)
+    - name: Add ClickHouse GPG key
+      become: true
+      ansible.builtin.shell: |
+        curl -fsSL 'https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key' | gpg --dearmor -o /usr/share/keyrings/clickhouse-keyring.gpg
+      args:
+        creates: "/usr/share/keyrings/clickhouse-keyring.gpg"
+    # - name: Update apt cache
+    #   apt:
+    #        update_cache: yes
+    #   ignore_errors: yes    
+    # Устанавливаем зависимости
+    - name: Install prerequisites
+      become: true
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+        state: present
+        update_cache: yes
+      ignore_errors: yes  
+    
+
+    # Добавляем репозиторий с динамическим определением архитектуры
+    - name: Add ClickHouse repository
+      become: true
+      ansible.builtin.shell: |
+        echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg arch=$(dpkg --print-architecture)] https://packages.clickhouse.com/deb stable main" > /etc/apt/sources.list.d/clickhouse.list
+      args:
+        creates: "/etc/apt/sources.list.d/clickhouse.list"
+
+    # Обновляем apt
+    - name: Update apt cache
+      become: true
+      ansible.builtin.apt:
+        update_cache: yes
+      ignore_errors: yes 
+    # Устанавливаем ClickHouse
+    - name: Install ClickHouse packages
+      become: true
+      ansible.builtin.apt:
+        name:
+          - clickhouse-server
+          - clickhouse-client
+        state: present
+        update_cache: no  # Кеш уже обновлён
+
+    # Запускаем сервис
+    - name: Start ClickHouse service
       become: true
       ansible.builtin.service:
         name: clickhouse-server
-        state: restarted
-  tasks:
-    - block:
-        - name: Get clickhouse distrib
-          ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.x86_64.rpm"
-            dest: "./{{ item }}-{{ clickhouse_version }}.rpm"
-          with_items: "{{ clickhouse_packages }}"
-      rescue:
-        - name: Get clickhouse distrib
-          ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
-            dest: "./clickhouse-common-static-{{ clickhouse_version }}.rpm"
-    - name: Install clickhouse packages
-      become: true
-      ansible.builtin.yum:
-        name:
-          - clickhouse-common-static-{{ clickhouse_version }}.rpm
-          - clickhouse-client-{{ clickhouse_version }}.rpm
-          - clickhouse-server-{{ clickhouse_version }}.rpm
-      notify: Start clickhouse service
-    - name: Flush handlers
-      meta: flush_handlers
+        state: started
+        enabled: yes
+
+    # Создаём базу данных
     - name: Create database
       ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
       register: create_db
-      failed_when: create_db.rc != 0 and create_db.rc !=82
+      failed_when: create_db.rc != 0 and create_db.rc != 82
       changed_when: create_db.rc == 0
-
 - name: Install and configure Vector
   hosts: clickhouse
   become: yes
