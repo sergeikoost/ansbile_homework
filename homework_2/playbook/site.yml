@@ -1,8 +1,13 @@
 ---
-- name: Install ClickHouse from official DEB packages
+- name: Install ClickHouse
   hosts: clickhouse
+  handlers:
+    - name: Start clickhouse service
+      become: true
+      ansible.builtin.service:
+        name: clickhouse-server
+        state: restarted
   tasks:
-  
     # Добавляем GPG-ключ (как в документации)
     - name: Add ClickHouse GPG key
       become: true
@@ -10,10 +15,8 @@
         curl -fsSL 'https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key' | gpg --dearmor -o /usr/share/keyrings/clickhouse-keyring.gpg
       args:
         creates: "/usr/share/keyrings/clickhouse-keyring.gpg"
-    # - name: Update apt cache
-    #   apt:
-    #        update_cache: yes
-    #   ignore_errors: yes    
+      changed_when: false
+
     # Устанавливаем зависимости
     - name: Install prerequisites
       become: true
@@ -24,9 +27,9 @@
           - curl
           - gnupg
         state: present
-        update_cache: yes
-      ignore_errors: yes  
-    
+        update_cache: true
+      register: prereq_install
+      failed_when: false
 
     # Добавляем репозиторий с динамическим определением архитектуры
     - name: Add ClickHouse repository
@@ -35,13 +38,16 @@
         echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg arch=$(dpkg --print-architecture)] https://packages.clickhouse.com/deb stable main" > /etc/apt/sources.list.d/clickhouse.list
       args:
         creates: "/etc/apt/sources.list.d/clickhouse.list"
+      changed_when: false
 
     # Обновляем apt
     - name: Update apt cache
       become: true
       ansible.builtin.apt:
-        update_cache: yes
-      ignore_errors: yes 
+        update_cache: true
+      register: apt_update
+      failed_when: false
+
     # Устанавливаем ClickHouse
     - name: Install ClickHouse packages
       become: true
@@ -50,15 +56,8 @@
           - clickhouse-server
           - clickhouse-client
         state: present
-        update_cache: no  # Кеш уже обновлён
-
-    # Запускаем сервис
-    - name: Start ClickHouse service
-      become: true
-      ansible.builtin.service:
-        name: clickhouse-server
-        state: started
-        enabled: yes
+        update_cache: false
+      notify: Start clickhouse service
 
     # Создаём базу данных
     - name: Create database
@@ -66,62 +65,68 @@
       register: create_db
       failed_when: create_db.rc != 0 and create_db.rc != 82
       changed_when: create_db.rc == 0
-- name: Install and configure Vector
+
+- name: Install Vector
   hosts: clickhouse
-  become: yes
-  vars:
-    vector_version: "0.34.0"
+  become: true
   tasks:
-    - name: Download Vector
-      ansible.builtin.get_url:
-        url: "https://packages.timber.io/vector/{{ vector_version }}/vector-{{ vector_version }}-x86_64-unknown-linux-gnu.tar.gz"
-        dest: "/tmp/vector.tar.gz"
-        checksum: "sha256:3a39e712da43126262db878c3ae7647b23aac88834dea2763cc84269cb3c0206"
+    # 1. Установка зависимостей
+    - name: Install prerequisites
+      become: true
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+        state: present
+        update_cache: true
+      register: vector_prereq
+      failed_when: false
 
-    - name: Create installation directory
-      ansible.builtin.file:
-        path: "/opt/vector-{{ vector_version }}"
-        state: directory
+    # 2. Добавление репозитория Vector (официальный метод)
+    - name: Add Vector repository
+      become: true
+      ansible.builtin.shell: |
+        bash -c "$(curl -fsSL https://setup.vector.dev)"
+      args:
+        creates: "/etc/apt/sources.list.d/vector.list"
+      changed_when: false
 
-    - name: Extract Vector
-      ansible.builtin.unarchive:
-        src: "/tmp/vector.tar.gz"
-        dest: "/opt/vector-{{ vector_version }}"
-        remote_src: yes
-        extra_opts: ["--strip-components=1"]
-        creates: "/opt/vector-{{ vector_version }}/bin/vector"
+    # 3. Обновление apt-кеша
+    - name: Update apt cache
+      become: true
+      ansible.builtin.apt:
+        update_cache: true
+      register: vector_apt_update
+      failed_when: false
 
-    - name: Create symlink to binary
-      ansible.builtin.file:
-        src: "/opt/vector-{{ vector_version }}/bin/vector"
-        dest: "/usr/local/bin/vector"
-        state: link
-        force: yes  # Добавлено force для перезаписи существующей ссылки
+    # 4. Установка Vector
+    - name: Install Vector
+      become: true
+      ansible.builtin.apt:
+        name: vector
+        state: present
+        update_cache: false
 
+    # 5. Настройка конфигурации
     - name: Create Vector config directory
       ansible.builtin.file:
         path: "/etc/vector"
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Deploy Vector config
       ansible.builtin.template:
-        src: "{{ playbook_dir }}/templates/vector.yaml.j2"
+        src: "templates/vector.yaml.j2"
         dest: "/etc/vector/vector.yml"
-        mode: '0644'
+        mode: "0644"
 
-    - name: Deploy systemd service
-      ansible.builtin.template:
-        src: "{{ playbook_dir }}/templates/vector.service.j2"
-        dest: "/etc/systemd/system/vector.service"
-        mode: '0644'
-
-    - name: Reload systemd
-      ansible.builtin.systemd:
-        daemon_reload: yes
-
-    - name: Ensure Vector is enabled and started
+    # 6. Запуск сервиса
+    - name: Enable and start Vector
+      become: true
       ansible.builtin.systemd:
         name: vector
         state: started
-        enabled: yes
+        enabled: true
+        daemon_reload: true
