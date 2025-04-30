@@ -1,14 +1,24 @@
 sources:
-  syslog:
-    type: syslog
-    mode: tcp
-    address: "0.0.0.0:514"
+  apache_logs:
+    type: demo_logs
+    format: apache_common
+    interval: 1
+    count: 100
 
 sinks:
-  clickhouse:
+  clickhouse_sink:
     type: clickhouse
-    inputs: ["syslog"]
+    inputs: [apache_logs]
     endpoint: "http://localhost:8123"
-    database: "default"
-    table: "logs"
+    database: "logs"
+    table: "access_logs"
     skip_unknown_fields: true
+    compression: gzip
+    format: "JSONEachRow"
+    request:
+      retry_attempts: 5
+      retry_initial_backoff_secs: 1
+      timeout_secs: 30
+    auth:
+      user: "default"
+      password: ""
