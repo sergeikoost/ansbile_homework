@@ -70,11 +70,7 @@
       with_items:
         - /etc/vector
         - /var/lib/vector
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> 56d397244681306db1fdd361f8604aa7bde1753a
     - name: Install prerequisites
       become: true
       ansible.builtin.apt:
@@ -138,7 +134,3 @@
         name: vector
         state: started
         enabled: true
-<<<<<<< HEAD
-=======
-
->>>>>>> 56d397244681306db1fdd361f8604aa7bde1753a
