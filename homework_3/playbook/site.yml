@@ -32,7 +32,8 @@
         repo: "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main"
         state: present
         filename: "clickhouse.list"
-
+      ignore_errors: true
+      
     - name: Install ClickHouse packages
       become: true
       ansible.builtin.apt:
@@ -49,7 +50,7 @@
       changed_when: create_db.rc == 0
 
 - name: Install Vector
-  hosts: clickhouse
+  hosts: vector
   become: true
   tasks:
     - name: Create vector user
@@ -91,6 +92,7 @@
       args:
         creates: "/etc/apt/sources.list.d/vector.list"
       changed_when: false
+      ignore_errors: true
 
     - name: Update apt cache
       become: true
