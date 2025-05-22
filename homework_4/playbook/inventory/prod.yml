@@ -1,0 +1,18 @@
+clickhouse:
+  hosts:
+    clickhouse:
+      ansible_host: 158.160.74.86
+      ansible_user: kusk111serj 
+      ansible_ssh_private_key_file: /root/.ssh/ansible_hm
+lighthouse:
+  hosts:
+    lighthouse:
+      ansible_host: 158.160.69.148
+      ansible_user: kusk111serj 
+      ansible_ssh_private_key_file: /root/.ssh/ansible_hm      
+vector:
+  hosts:
+    vector:
+      ansible_host: 158.160.95.231
+      ansible_user: kusk111serj 
+      ansible_ssh_private_key_file: /root/.ssh/ansible_hm            
