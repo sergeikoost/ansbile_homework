@@ -1,6 +1,6 @@
 ### Подготовка к выполнению.
 
-#1 Создайте два пустых публичных репозитория в любом своём проекте: vector-role и lighthouse-role.
+Создайте два пустых публичных репозитория в любом своём проекте: vector-role и lighthouse-role.
 Добавьте публичную часть своего ключа к своему профилю на GitHub.
 
 
@@ -9,3 +9,8 @@
 Скопировал playbook с прошлой работы в директорию для этой работы (homework_4), при помощи команд ansible-galaxy role init сделал 3 роли для выполнения поставленной задачи -  сделать roles для ClickHouse, Vector и LightHouse и написать playbook для использования этих ролей.
 
 ![ansible_homework4 0](https://github.com/user-attachments/assets/e6ea984f-1688-4918-b44e-386ba9c09247)
+
+
+# Задача 1 
+
+Создал файл  requirements.yml в корневом каталоге playbook.
