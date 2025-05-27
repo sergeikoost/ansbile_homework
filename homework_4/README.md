@@ -11,11 +11,11 @@
 
 
 
-# Cоздал файл  requirements.yml в корневом каталоге playbook.
+### 1. Cоздал файл  requirements.yml в корневом каталоге playbook.
 
 
 
-# При помощи ansible-galaxy скачайте себе эту роль.
+### 2. При помощи ansible-galaxy скачайте себе эту роль.
 
 
 
@@ -27,7 +27,7 @@
 
 
 
-# Создайте новый каталог с ролью при помощи ansible-galaxy role init vector-role. Повторите шаги 3–6 для LightHouse. Помните, что одна роль должна настраивать один продукт.
+### 3. Создайте новый каталог с ролью при помощи ansible-galaxy role init vector-role. Повторите шаги 3–6 для LightHouse. Помните, что одна роль должна настраивать один продукт.
 
 ansible-galaxy role init vector-role 
 ansible-galaxy role init lighthouse-role
