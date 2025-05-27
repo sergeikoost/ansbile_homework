@@ -1,7 +1,0 @@
----
-# vars file for clickhouse-role
-clickhouse_packages:
-  - "clickhouse-client"
-  - "clickhouse-server"
-  - "clickhouse-common-static"
-clickhouse_repo_url: "deb [arch=arm64 signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main"
