@@ -1,2 +1,85 @@
 ---
 # tasks file for vector-role
+- name: Create vector user
+  become: true
+  ansible.builtin.user:
+    name: vector
+    system: true
+    create_home: false
+
+- name: Create Vector directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: vector
+    group: vector
+    mode: "0755"
+  with_items:
+    - /etc/vector
+    - /var/lib/vector
+
+- name: Install prerequisites
+  become: true
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+    state: present
+    update_cache: true
+  register: vector_prereq
+  failed_when: false
+
+- name: Add Vector repository
+  become: true
+  ansible.builtin.shell: |
+    bash -c "$(curl -fsSL https://setup.vector.dev)"
+  args:
+    creates: "/etc/apt/sources.list.d/vector.list"
+  changed_when: false
+  ignore_errors: true
+
+- name: Update apt cache
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+  register: vector_apt_update
+  failed_when: false
+  ignore_errors: true
+
+- name: Install Vector
+  become: true
+  ansible.builtin.apt:
+    name: vector
+    state: present
+    update_cache: false
+
+- name: Deploy Vector config
+  become: true
+  ansible.builtin.template:
+    src: "templates/vector.yaml.j2"
+    dest: "/etc/vector/vector.yaml"
+    owner: vector
+    group: vector
+    mode: "0640"
+
+- name: Install Vector service file
+  become: true
+  ansible.builtin.template:
+    src: "templates/vector.service.j2"
+    dest: "/etc/systemd/system/vector.service"
+    mode: "0644"
+
+- name: Reload systemd
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Enable and start Vector
+  become: true
+  ansible.builtin.systemd:
+    name: vector
+    state: started
+    enabled: true

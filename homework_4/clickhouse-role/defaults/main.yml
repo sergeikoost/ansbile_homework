@@ -1,2 +1,3 @@
 ---
 # defaults file for clickhouse-role
+clickhouse_version: "22.3.3.44"
