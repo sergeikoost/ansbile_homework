@@ -10,10 +10,10 @@
 
 # Задача 1 
 
-Создал файл  requirements.yml в корневом каталоге playbook.
+1) Создал файл  requirements.yml в корневом каталоге playbook.
 
 
-При помощи ansible-galaxy скачайте себе эту роль.
+2) При помощи ansible-galaxy скачайте себе эту роль.
 
 
 Скачал роль и поместил её в каталог с домашней работой №4 при помощи команды ansible-galaxy install -r requirements.yml -p /home/ansbile_homework/homework_4/
@@ -22,7 +22,7 @@
 ![ansible_homework4 1](https://github.com/user-attachments/assets/afe9f07a-fb5e-4f2f-86c8-4b0c354bc5f4)
 
 
-Создайте новый каталог с ролью при помощи ansible-galaxy role init vector-role. Повторите шаги 3–6 для LightHouse. Помните, что одна роль должна настраивать один продукт.
+3) Создайте новый каталог с ролью при помощи ansible-galaxy role init vector-role. Повторите шаги 3–6 для LightHouse. Помните, что одна роль должна настраивать один продукт.
 
 ansible-galaxy role init vector-role 
 ansible-galaxy role init lighthouse-role
