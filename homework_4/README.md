@@ -8,15 +8,14 @@
 У меня единый репозиторий для всех домашних работ в ansible, поэтому уже все заранее созданно и будет выполняться тут. Скопировал playbook с прошлой работы в директорию для этой работы (homework_4), при помощи команд ansible-galaxy role init сделал 3 роли для выполнения поставленной задачи -  сделать roles для ClickHouse, Vector и LightHouse и написать playbook для использования этих ролей.
 
 
-# Задача 1 
 
 
 
-1) Создал файл  requirements.yml в корневом каталоге playbook.
+# Cоздал файл  requirements.yml в корневом каталоге playbook.
 
 
 
-2) При помощи ansible-galaxy скачайте себе эту роль.
+# При помощи ansible-galaxy скачайте себе эту роль.
 
 
 
@@ -28,7 +27,7 @@
 
 
 
-3) Создайте новый каталог с ролью при помощи ansible-galaxy role init vector-role. Повторите шаги 3–6 для LightHouse. Помните, что одна роль должна настраивать один продукт.
+# Создайте новый каталог с ролью при помощи ansible-galaxy role init vector-role. Повторите шаги 3–6 для LightHouse. Помните, что одна роль должна настраивать один продукт.
 
 ansible-galaxy role init vector-role 
 ansible-galaxy role init lighthouse-role
