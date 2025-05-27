@@ -32,4 +32,8 @@
 ansible-galaxy role init vector-role 
 ansible-galaxy role init lighthouse-role
 
-После команды ansible-galaxy role init создается каталог с ролью. 
+После команды ansible-galaxy role init создается каталог с ролью. Также изменил файл ansible.cfg, добавил туда переменную:
+
+```
+roles_path = /home/ansbile_homework/homework_4/roles
+```
