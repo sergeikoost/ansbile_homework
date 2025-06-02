@@ -57,3 +57,23 @@ playbook/
 ├── requirements.yml
 └── site.yml
 ```
+
+Изменяем полностью site.yml чтобы он использовал роли:
+
+```
+---
+- name: Install ClickHouse
+  hosts: clickhouse
+  roles:
+   - clickhouse
+
+- name: Install Vector
+  hosts: vector
+  roles:
+   - vector-role
+- name: Install Lighthouse
+  hosts: lighthouse
+  roles: 
+   - lighthouse-role
+```
+
