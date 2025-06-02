@@ -37,3 +37,20 @@ ansible-galaxy role init lighthouse-role
 ```
 roles_path = /home/ansbile_homework/homework_4/roles
 ```
+
+
+### Итого получаем следующую структуру проекта:
+
+playbook/
+├── ansible.cfg
+├── group_vars/
+│   └── clickhouse/
+│       └── vars.yml
+├── inventory/
+│   └── prod.yml
+├── roles/
+│   ├── clickhouse/
+│   ├── vector-role/
+│   └── lighthouse-role/
+├── requirements.yml
+└── site.yml
