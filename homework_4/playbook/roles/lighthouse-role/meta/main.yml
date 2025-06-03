@@ -20,4 +20,8 @@ galaxy_info:
         - bullseye
         - bookworm
 
-dependencies: []
+dependencies:
+  - src: git@github.com:sergeikoost/ansible_lighthouse_role.git
+    name: vector_role
+    version: "v1.0.0"
+    scm: git
