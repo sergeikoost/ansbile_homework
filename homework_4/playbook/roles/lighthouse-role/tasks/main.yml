@@ -1,10 +1,20 @@
 ---
 # tasks file for lighthouse-role
+- name: Allow release info change for apt
+  ansible.builtin.lineinfile:
+    path: /etc/apt/apt.conf.d/99releaseinfochange
+    state: present
+    create: true
+    line: 'Acquire::AllowReleaseInfoChange::Suite "true";'
+    mode: "0644"
+  when: ansible_pkg_mgr == "apt"
+
 - name: Install Nginx and dependencies
   ansible.builtin.apt:
     name:
       - nginx
       - unzip
+      - git  # Добавляем git для совместимости с подходом рабочей роли
     state: present
     update_cache: true
 
@@ -26,6 +36,7 @@
     dest: "/var/www/lighthouse"
     remote_src: true
     extra_opts: ["--strip-components=1"]
+  notify: Restart Nginx
 
 - name: Configure Nginx
   ansible.builtin.template:
